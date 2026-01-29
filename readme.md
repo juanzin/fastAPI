@@ -18,6 +18,7 @@ NOTES:
 
 * to see the documentation add baseURL + /docs for example: http://127.0.0.1:8000/docs
 
+* another page to see documentation use this route: http://127.0.0.1:8000/redoc
 
 
 
