@@ -1,5 +1,16 @@
 NOTES:
 
+#INSTALLATION
+
+* create virtual enviroment: python -m venv fastAPI
+
+* to allow run scripts in windows (run in power shell): Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass 
+* run this command to enable the virtual enviroment: G:\applications\fastAPI\Scripts\Activate.ps1
+
+* pip install fastapi uvicorn
+
+* select python interpreter: press ctrl +  shift + p and select python interpret (enviroment name)
+
 * run the application: uvicorn main:app
     -main: is the filename (main.py)
     -app: application name
@@ -19,7 +30,3 @@ NOTES:
 * to see the documentation add baseURL + /docs for example: http://127.0.0.1:8000/docs
 
 * another page to see documentation use this route: http://127.0.0.1:8000/redoc
-
-
-
-to allow run scripts in windows (run in power shell): Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
