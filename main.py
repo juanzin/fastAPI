@@ -1,5 +1,25 @@
 from fastapi import FastAPI, Body
 from fastapi.responses import HTMLResponse
+from pydantic import BaseModel
+from typing import Optional, List
+
+## model
+# para definir una propiedad como opcional podemos hacerlo de la siguiente manera: int | None = None
+# o usando typing: Optional[int]
+
+class Movie(BaseModel):
+    id: int
+    title: str
+    author: str
+    year: int
+    category: str
+
+class MovieUpdate(BaseModel):
+    title: str
+    author: str
+    year: int
+    category: str
+
 
 app =  FastAPI()
 app.title = "FAST API TEST"
@@ -40,12 +60,12 @@ def home():
     return HTMLResponse('<h1> html element</h1>')
 
 @app.get('/allMovies', tags=['Movies'])
-def home():
+def get_all_movies() -> List[Movie]: # returning a List of movies
     return movies
 
 # to send a parameter do this:
 @app.get('/movies/{id}', tags=['Movies'])
-def get_movie(_id: int):
+def get_movie(_id: int) -> Movie:
     for movie in movies:
         if movie['id'] == _id:
             return movie
@@ -54,7 +74,7 @@ def get_movie(_id: int):
 #Query parameters
 #parameters added only in the function
 @app.get('/movies/', tags=['Movies'])
-def get_movie_by_category(_category: str, _year: int):
+def get_movie_by_category(_category: str, _year: int) -> Movie: ## retornando tipo
     for movie in movies:
         if movie['category'] == _category:
             return movie
@@ -63,37 +83,21 @@ def get_movie_by_category(_category: str, _year: int):
 ##### POST ############
 ## Request body
 @app.post('/movies', tags=['Movies'])
-def create_movie(
-    id: int = Body(), 
-    year: int = Body(),
-    category: str = Body(),
-    title: str = Body(),
-    author: str = Body()):
+def create_movie(movie: Movie):
 
-    movies.append({
-        "id": id,
-        "year": year,
-        "category": category,
-        "title": title,
-        "author": author
-    })
+    movies.append(movie.model_dump())
 
     return "Ok"
 
 @app.put("/movies/{id}", tags=['Movies'])
-def update_movie(
-    id: int,
-    year: int = Body(),
-    category: str = Body(),
-    title: str = Body(),
-    author: str = Body()):
+def update_movie(id: int, _movie: MovieUpdate):
     
-    for movie in movies:
-        if movie["id"] == id:
-            movie["title"] = title
-            movie["year"] = year
-            movie["category"] = category
-            movie["author"] = author
+    for item in movies:
+        if item["id"] == id:
+            item["title"] = _movie.title
+            item["year"] = _movie.year
+            item["category"] = _movie.category
+            item["author"] = _movie.author
 
     return movies
 
