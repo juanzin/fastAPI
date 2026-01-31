@@ -7,9 +7,19 @@ from typing import Optional, List
 # para definir una propiedad como opcional podemos hacerlo de la siguiente manera: int | None = None
 # o usando typing: Optional[int]
 
+# data validation
+# Field(min_length=5, max_length=15)
+
 class Movie(BaseModel):
     id: int
     title: str
+    author: str
+    year: int
+    category: str
+
+class MovieCreate(BaseModel):
+    id: int
+    title: str = Field(min_length=5, max_length=15) # data validation
     author: str
     year: int
     category: str
@@ -108,3 +118,5 @@ def delete_movie(id: int):
             movies.remove(movie)
 
     return movies
+
+
