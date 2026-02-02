@@ -1,7 +1,8 @@
 from fastapi import FastAPI, Body
-from fastapi.responses import HTMLResponse
-from pydantic import BaseModel
+from fastapi.responses import HTMLResponse, JSONResponse
+from pydantic import BaseModel, Field
 from typing import Optional, List
+import datetime
 
 ## model
 # para definir una propiedad como opcional podemos hacerlo de la siguiente manera: int | None = None
@@ -9,6 +10,14 @@ from typing import Optional, List
 
 # data validation
 # Field(min_length=5, max_length=15)
+# gt greather than
+# ge greather than or equal
+# lt less than
+# le less than or equal
+
+# you can add default values using the parameter <<default>> example: Field(min_length=5, max_length=15, default="no title")
+# or you can use: model_config... see the example in movieCreate
+# the next funcion converts to dictionary: movie.model_dump()
 
 class Movie(BaseModel):
     id: int
@@ -19,10 +28,22 @@ class Movie(BaseModel):
 
 class MovieCreate(BaseModel):
     id: int
-    title: str = Field(min_length=5, max_length=15) # data validation
-    author: str
-    year: int
-    category: str
+    title: str = Field(min_length=3, max_length=15) # data validation
+    author: str = Field(min_length=3, max_length=30)
+    year: int = Field(le=datetime.date.today().year, ge=1900)
+    category: str = Field(min_length=3, max_length=20)
+
+    model_config = {
+        "json_schema_extra": {
+            "example": {
+                'id': 1,
+                'title': 'my title',
+                'author': 'John',
+                'year': 2020,
+                'category': 'action'
+            }
+        }
+    }
 
 class MovieUpdate(BaseModel):
     title: str
@@ -35,22 +56,7 @@ app =  FastAPI()
 app.title = "FAST API TEST"
 app.version = "2.0.0"
 
-movies = [
-        {
-            "id": 1,
-            "title": "movie 1",
-            "author": "john",
-            "year": 2000,
-            "category": "action"
-        },
-        {
-            "id": 2,
-            "title": "my love",
-            "author": "John",
-            "year": 2020,
-            "category": "romantic"
-        }
-]
+movies: list[Movie] = []
 
 
 @app.get('/')
@@ -87,13 +93,13 @@ def get_movie(_id: int) -> Movie:
 def get_movie_by_category(_category: str, _year: int) -> Movie: ## retornando tipo
     for movie in movies:
         if movie['category'] == _category:
-            return movie
+            return movie.model_dump()
     return []
 
 ##### POST ############
 ## Request body
 @app.post('/movies', tags=['Movies'])
-def create_movie(movie: Movie):
+def create_movie(movie: MovieCreate):
 
     movies.append(movie.model_dump())
 
@@ -117,6 +123,6 @@ def delete_movie(id: int):
         if(movie["id"] == id):
             movies.remove(movie)
 
-    return movies
+    return [movie.model_dump() for movie in movies]
 
 
