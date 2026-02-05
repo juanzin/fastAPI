@@ -84,10 +84,10 @@ def home():
 def home():
     return HTMLResponse('<h1> html element</h1>')
 
-@app.get('/allMovies', tags=['Movies'])
+@app.get('/allMovies', tags=['Movies'], status_code=200, response_description="successfull request (John)")
 async def get_all_movies() -> List[Movie]: # returning a List of movies
     # time.sleep(100)
-    return JSONResponse(content=movies)
+    return JSONResponse(content=movies, status_code=200)
 
 # to send a parameter do this:
 @app.get('/movies/{id}', tags=['Movies'])
@@ -95,7 +95,7 @@ async def get_movie(id: int = Path(gt=0)) -> Movie | dict:
     for movie in movies:
         if movie["id"] == id:
             return JSONResponse(content=movie)
-    return JSONResponse(content={})
+    return JSONResponse(content={}, status_code=404)
 
 #Query parameters
 #parameters added only in the function
@@ -103,8 +103,8 @@ async def get_movie(id: int = Path(gt=0)) -> Movie | dict:
 async def get_movie_by_category(_category: str = Query(min_length=5, max_length=20)) -> Movie | dict: ## retornando tipo
     for movie in movies:
         if movie['category'] == _category:
-            return movie
-    return {}
+            return JSONResponse(content=movie, status_code=200)
+    return JSONResponse(content={}, status_code=404)
 
 ##### POST ############
 ## Request body
