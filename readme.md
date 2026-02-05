@@ -11,7 +11,7 @@ NOTES:
 
 * select python interpreter: press ctrl +  shift + p and select python interpret (enviroment name)
 
-* run the application: uvicorn main:app
+* run the application: uvicorn src.main:app
     -main: is the filename (main.py)
     -app: application name
     -5000: is the port

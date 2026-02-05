@@ -1,10 +1,8 @@
-import time
-from fastapi import FastAPI, Body, Path, Query, APIRouter
-from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse, RedirectResponse, FileResponse
-from pydantic import BaseModel, Field, validator
-from typing import Optional, List
-import datetime
+from fastapi import Path, Query, APIRouter
+from fastapi.responses import JSONResponse
+from typing import List
 from src.models.movie_model import Movie, MovieCreate, MovieUpdate
+
 
 movies: list[Movie] = []
 movie_router = APIRouter()
