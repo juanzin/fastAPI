@@ -1,6 +1,6 @@
 import time
 from fastapi import FastAPI, Body, Path, Query
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse, RedirectResponse, FileResponse
 from pydantic import BaseModel, Field
 from typing import Optional, List
 import datetime
@@ -66,7 +66,15 @@ def home():
 
 @app.get('/', tags=['Home'])
 def home():
-    return "Hola preciosa"
+    return PlainTextResponse(content="Hola preciosa")
+
+@app.get('/redirect', tags=['Home'])
+def redirect():
+    return RedirectResponse("/allMovies", status_code=303)
+
+@app.get('/getFile', tags=['Home'])
+def getFile():
+    return FileResponse("book.pdf")
 
 @app.get('/dictionary', tags=['Home'])
 def home():
@@ -76,19 +84,18 @@ def home():
 def home():
     return HTMLResponse('<h1> html element</h1>')
 
-app =  FastAPI()
 @app.get('/allMovies', tags=['Movies'])
 async def get_all_movies() -> List[Movie]: # returning a List of movies
     # time.sleep(100)
-    return movies
+    return JSONResponse(content=movies)
 
 # to send a parameter do this:
 @app.get('/movies/{id}', tags=['Movies'])
 async def get_movie(id: int = Path(gt=0)) -> Movie | dict:
     for movie in movies:
         if movie["id"] == id:
-            return movie
-    return {}
+            return JSONResponse(content=movie)
+    return JSONResponse(content={})
 
 #Query parameters
 #parameters added only in the function
