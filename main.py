@@ -1,7 +1,7 @@
 import time
 from fastapi import FastAPI, Body, Path, Query
 from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse, RedirectResponse, FileResponse
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 from typing import Optional, List
 import datetime
 
@@ -29,7 +29,7 @@ class Movie(BaseModel):
 
 class MovieCreate(BaseModel):
     id: int
-    title: str = Field(min_length=3, max_length=15) # data validation
+    title: str
     author: str = Field(min_length=3, max_length=30)
     year: int = Field(le=datetime.date.today().year, ge=1900)
     category: str = Field(min_length=3, max_length=20)
@@ -45,6 +45,15 @@ class MovieCreate(BaseModel):
             }
         }
     }
+
+    ## custom validations
+    @validator('title')
+    def validate_title(cls, value):
+        if len(value) < 5:
+            raise ValueError('Title field muts have a minimun lenght of 5 caharacters')
+        if len(value) > 20:
+            raise ValueError('Title field muts have a maximun lenght of 15 caharacters')
+        return value
 
 class MovieUpdate(BaseModel):
     title: str
