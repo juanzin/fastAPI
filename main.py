@@ -1,4 +1,5 @@
-from fastapi import FastAPI, Body
+import time
+from fastapi import FastAPI, Body, Path, Query
 from fastapi.responses import HTMLResponse, JSONResponse
 from pydantic import BaseModel, Field
 from typing import Optional, List
@@ -75,38 +76,40 @@ def home():
 def home():
     return HTMLResponse('<h1> html element</h1>')
 
+app =  FastAPI()
 @app.get('/allMovies', tags=['Movies'])
-def get_all_movies() -> List[Movie]: # returning a List of movies
+async def get_all_movies() -> List[Movie]: # returning a List of movies
+    # time.sleep(100)
     return movies
 
 # to send a parameter do this:
 @app.get('/movies/{id}', tags=['Movies'])
-def get_movie(_id: int) -> Movie:
+async def get_movie(id: int = Path(gt=0)) -> Movie | dict:
     for movie in movies:
-        if movie['id'] == _id:
+        if movie["id"] == id:
             return movie
-    return []
+    return {}
 
 #Query parameters
 #parameters added only in the function
 @app.get('/movies/', tags=['Movies'])
-def get_movie_by_category(_category: str, _year: int) -> Movie: ## retornando tipo
+async def get_movie_by_category(_category: str = Query(min_length=5, max_length=20)) -> Movie | dict: ## retornando tipo
     for movie in movies:
         if movie['category'] == _category:
-            return movie.model_dump()
-    return []
+            return movie
+    return {}
 
 ##### POST ############
 ## Request body
 @app.post('/movies', tags=['Movies'])
-def create_movie(movie: MovieCreate):
+async def create_movie(movie: MovieCreate):
 
     movies.append(movie.model_dump())
 
     return "Ok"
 
 @app.put("/movies/{id}", tags=['Movies'])
-def update_movie(id: int, _movie: MovieUpdate):
+async def update_movie(id: int, _movie: MovieUpdate):
     
     for item in movies:
         if item["id"] == id:
@@ -118,7 +121,7 @@ def update_movie(id: int, _movie: MovieUpdate):
     return movies
 
 @app.delete("/movies/{id}",  tags=['Movies'])
-def delete_movie(id: int):
+async def delete_movie(id: int):
     for movie in movies:
         if(movie["id"] == id):
             movies.remove(movie)
