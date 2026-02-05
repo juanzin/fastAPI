@@ -5,7 +5,7 @@ NOTES:
 * create virtual enviroment: python -m venv fastAPI
 
 * to allow run scripts in windows (run in power shell): Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass 
-* run this command to enable the virtual enviroment: G:\applications\fastAPI\Scripts\Activate.ps1
+* run this command to enable the virtual enviroment: G:\applications\backend-python\fastAPI\Scripts\Activate.ps1
 
 * pip install fastapi uvicorn
 
