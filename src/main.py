@@ -30,7 +30,18 @@ from typing import Annotated
 # or you can use: model_config... see the example in movieCreate
 # the next funcion converts to dictionary: movie.model_dump()
 
-app =  FastAPI()
+## GLOBAL DEPENDENCIES
+def denpendency1():
+    # you can add parameters in the function, but they will required in all endpoints
+    # because is a global dependency
+    print("dependency 1")
+
+def denpendency2():
+    print("dependency 2")
+
+## END GLOBAL DEPENDENCIES
+
+app =  FastAPI(dependencies=[Depends(denpendency1), Depends(denpendency2)]) ## global dependency
 app.title = "FAST API TEST"
 app.version = "2.0.0"
 
@@ -62,18 +73,28 @@ def home(request: Request):
     return templates.TemplateResponse('index.html', {'request': request, 'message': 'Welcome'})
 
 # dependecies
-def common_params(start_date: str, end_date: str):
-    return {"start_date": start_date, "end_date": end_date}
+# WITH A FUNCTION
+# def common_params(start_date: str, end_date: str):
+#     return {"start_date": start_date, "end_date": end_date}
 
-commonDep = Annotated[dict, Depends(common_params)] # dependency with annotated, type = dict, dependency=common_params, this variable can be reused in customers
+# commonDep = Annotated[dict, Depends(common_params)] # dependency with annotated, type = dict, dependency=common_params, this variable can be reused in customers
+
+
+# WITH A CLASS
+# use commons: commonDep = Depends(), where commonDep is the type
+class commonDep:
+    def __init__(self, start_date: str, end_date: str):
+        self.start_date = start_date
+        self.end_date = end_date
 
 @app.get('/users', tags=['Users'])
-def get_users(commons: commonDep):
-    return f"Users created between {commons['start_date']} and {commons['end_date']}"
+def get_users(commons: commonDep = Depends()):
+    return f"Users created between {commons.start_date} and {commons.end_date}"
 
 @app.get('/customers', tags=['Users'])
-def get_customers(commons: dict = Depends(common_params)):
-    return f"Customers created between {commons['start_date']} and {commons['end_date']}"
+def get_customers(commons: commonDep = Depends()):
+    return f"Customers created between {commons.start_date} and {commons.end_date}"
+
 # end depencies
 
 @app.get('/redirect', tags=['Home'])
