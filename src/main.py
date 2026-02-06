@@ -1,5 +1,5 @@
 import time
-from fastapi import FastAPI, Body, Path, Query
+from fastapi import FastAPI
 from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse, RedirectResponse, FileResponse, Response
 from pydantic import BaseModel, Field, validator
 from typing import Optional, List
@@ -11,6 +11,9 @@ from fastapi.requests import Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import os
+# dependecies
+from fastapi import Depends, Query
+from typing import Annotated
 
 ## model
 # para definir una propiedad como opcional podemos hacerlo de la siguiente manera: int | None = None
@@ -57,6 +60,21 @@ templates = Jinja2Templates(directory=templates_path)
 @app.get('/', tags=['Home'])
 def home(request: Request):
     return templates.TemplateResponse('index.html', {'request': request, 'message': 'Welcome'})
+
+# dependecies
+def common_params(start_date: str, end_date: str):
+    return {"start_date": start_date, "end_date": end_date}
+
+commonDep = Annotated[dict, Depends(common_params)] # dependency with annotated, type = dict, dependency=common_params, this variable can be reused in customers
+
+@app.get('/users', tags=['Users'])
+def get_users(commons: commonDep):
+    return f"Users created between {commons['start_date']} and {commons['end_date']}"
+
+@app.get('/customers', tags=['Users'])
+def get_customers(commons: dict = Depends(common_params)):
+    return f"Customers created between {commons['start_date']} and {commons['end_date']}"
+# end depencies
 
 @app.get('/redirect', tags=['Home'])
 def redirect():
