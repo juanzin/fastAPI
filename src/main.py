@@ -7,6 +7,10 @@ import datetime
 from src.routers.movie_router import movie_router
 from src.utils.http_error_handler import HTTPErrorHandler
 from fastapi.requests import Request
+## templates
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+import os
 
 ## model
 # para definir una propiedad como opcional podemos hacerlo de la siguiente manera: int | None = None
@@ -38,13 +42,21 @@ async def http_error_handler(request: Request, call_next) -> Response | JSONResp
 
 ##### end middleware section
 
-@app.get('/')
-def home():
-    return "Hola bonita"
+## region templates
+static_path = os.path.join(os.path.dirname(__file__), 'static/')
+templates_path = os.path.join(os.path.dirname(__file__), 'templates/')
+
+app.mount('/static', StaticFiles(directory=static_path), 'static')
+templates = Jinja2Templates(directory=templates_path)
+## end region templates
+
+# @app.get('/')
+# def home():
+#     return "Hola bonita"
 
 @app.get('/', tags=['Home'])
-def home():
-    return PlainTextResponse(content="Hola preciosa")
+def home(request: Request):
+    return templates.TemplateResponse('index.html', {'request': request, 'message': 'Welcome'})
 
 @app.get('/redirect', tags=['Home'])
 def redirect():
