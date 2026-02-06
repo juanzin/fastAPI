@@ -4,8 +4,10 @@ from app.config.database import engine
 from app import models
 from app.routes.item_router import items_router
 
+# it requires: pip install sqlmodel pymysql
+# to connect to mysql server
 
-SQLModel.metadata.create_all(engine)
+SQLModel.metadata.create_all(engine) # connect to the database
 
 app =  FastAPI()
 app.title = "FAST API TEST"
